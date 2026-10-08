@@ -1,0 +1,83 @@
+name: 协作请求 / Collaboration Request
+description: 用这个模板发起技能互助、旧货交易、信息交换或朋友牵线
+title: "[协作] "
+labels: ["collab-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢来提请求。
+
+        **说明**：我本人不看邮箱，但会派 agent 定期检查 Issue 列表 —— 这里是最快的渠道。不保证实时响应。
+
+        如果你是想提交一份让 agent 直接解析的请求，请按 `agent/README.md` 里的协议填写下面几项。
+
+  - type: dropdown
+    id: intent
+    attributes:
+      label: 意图类型
+      description: 你想要的是哪一类？
+      options:
+        - 技能支持 (skill_support)
+        - 旧货交易 (item_exchange)
+        - 信息交换 (info_exchange)
+        - 朋友牵线 (friend_referral)
+        - 其他 (other)
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: 目标节点
+      description: 命中的 profile.json 节点，例如 capabilities#long-horizon-planning、items_for_exchange#oppo-phones、referrals#bro-2
+      placeholder: "capabilities#long-horizon-planning"
+    validations:
+      required: false
+
+  - type: input
+    id: from_whom
+    attributes:
+      label: 你是谁 / 你代表谁
+      description: 人类可读的描述即可，不必是真名
+      placeholder: "我是一名在读研究生，正在准备一次预算紧张的毕业旅行"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_you_want
+    attributes:
+      label: 你想要什么
+      description: 尽量具体。写清目标和约束，别只写「帮我一下」。也欢迎直接粘贴替你来提请求的 agent 生成的内容。
+      placeholder: |
+        我想要：一次 3 国 10 天、总预算尽量压低的行程顺序建议
+        我卡在：只有 10 天假，转机时间不好排，住宿想省钱又不想太偏
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_you_give
+    attributes:
+      label: 你能给什么
+      description: 对价不限于金钱。技能、物品、信息、帮忙都算。**留空会被判定为低优先级。**
+      placeholder: "我是前端工程师，可以帮你做网页性能诊断；或者我手上有闲置的机械键盘可以换"
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 期望的结果与时间
+      placeholder: "希望两周内拿到一份行程方案；不需要长期跟进"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 请确认
+      options:
+        - label: 我已阅读 README 中的隐私声明，理解本空间不公开主人的真名、城市、住址、雇主名、旧货价格与账户金额
+          required: true
+        - label: 如果涉及朋友牵线，我理解需要先经对方同意，且不会绕过牵线流程直接联系
+          required: true

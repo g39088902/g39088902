@@ -1,0 +1,75 @@
+# ---- 编辑器 / IDE ----
+.idea/
+.vs/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.clion/
+*.swp
+*.swo
+*~
+
+# ---- 操作系统 ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ---- 日志与临时文件 ----
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.cache
+
+# ---- 环境与密钥（注意：本仓库公开，任何密钥都不要提交）----
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+secrets/
+credentials/
+*.secret
+
+# ---- 本地个人数据（不该进公网的内容）----
+# 真实姓名、城市、住址、公司名、旧货价格、账户金额、持仓成本
+private/
+local/
+*.private.md
+*.local.json
+
+# ---- Agent 工作区（本地笔记，含内部决策与隐私备注，不上公网）----
+.workbuddy/
+
+# ---- 依赖与构建产物 ----
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+dist/
+build/
+out/
+target/
+*.egg-info/
+
+# ---- 编辑器自动生成 ----
+# 若使用支持 front-matter 校验的工具，可能产生缓存
+.cache/
+.temp/
+
+# ---- 说明 ----
+# 本仓库是公开的个人空间，请勿提交任何未在 README 隐私声明中列明的个人信息。
+# 详见 README.md 的「隐私声明」一节。

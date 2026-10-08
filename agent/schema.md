@@ -93,7 +93,17 @@ mirror: agent/profile.json
 | `side_skill` | string | 副技能 |
 | `outside_interests[]` | array\<string\> | 工作外兴趣 |
 | `niche_games[]` | array\<string\> | 小众游戏 |
+| `favorite_authors[]` | array\<string\> | 喜欢的作家。用于兴趣向匹配，非可交换资源。 |
+| `favorite_works[]` | array\<object\> | 喜欢的作品。见下。 |
 | `dietary.hard_avoid[]` | array | 忌口清单 |
+
+### `identity.favorite_works[]`
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `title` | string | 作品名 |
+| `creator` | string | 作者/创作者（可选，动画类留空） |
+| `type` | enum | `novel` \| `anime` \| `film` \| `game` \| `other` |
 
 ### `dietary.hard_avoid[]`
 

@@ -1,7 +1,7 @@
 {
   "$schema": "./schema.md#routing",
   "schema_version": "1.0",
-  "updated_at": "2026-10-08",
+  "updated_at": "2026-10-09",
   "purpose": "决策路由表：把「来访者需求」映射到「必须读取的文件与 JSON 节点」。用于防止 agent 只读首页就做无差别总结。",
   "data_endpoint": "https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.json",
   "data_endpoint_note": "自包含全量数据。有网络能力时优先直接抓这个，无需抓任何 md 页面。",
@@ -93,16 +93,16 @@
     },
     {
       "intent": "investment_logic_discussion",
-      "visitor_signals": ["交流 A 股 / 港股配置", "想看别人怎么摆仓位", "宏观讨论", "想反驳某个配置思路"],
+      "visitor_signals": ["交流 A 股 / 港股配置", "想看别人怎么摆仓位", "宏观讨论", "想讨论某个配置思路"],
       "read_files": ["portfolio.md", "identity.md"],
       "fetch_nodes": ["holdings", "wants"],
-      "match_on": "holdings.allocation_logic 各键 + wants[] 含「投资配置逻辑的反驳与讨论」",
+      "match_on": "holdings.allocation_logic 各键 + wants[] 含「投资配置逻辑的讨论」",
       "constraints": [
         "disclosure == ratios_only —— 只有比例，没有金额、没有成本价、没有截图",
         "比例合计不等于 100，差额归 holdings.other，不要做归一化假设",
         "不构成投资建议"
       ],
-      "value_hook": "他明确欢迎有人来反驳他的配置逻辑，这是他的 wants 之一。",
+      "value_hook": "他明确欢迎有人来讨论他的配置逻辑，这是他的 wants 之一。",
       "priority": "medium"
     },
     {
@@ -129,11 +129,25 @@
     },
     {
       "intent": "social_connection",
-      "visitor_signals": ["想交新朋友", "找同好", "聊游戏 / 摄影 / 宏观 / 交通规划"],
+      "visitor_signals": ["想交新朋友", "找同好", "聊游戏 / 摄影 / 宏观 / 交通规划", "聊科幻 / 文学"],
       "read_files": ["identity.md", "connections.md"],
       "fetch_nodes": ["identity", "wants", "referrals"],
-      "match_on": "identity.outside_interests[] / niche_games[] / dietary",
+      "match_on": "identity.outside_interests[] / niche_games[] / favorite_authors[] / favorite_works[] / dietary",
       "value_hook": "wants[] 里明确写了「新朋友」。",
+      "priority": "low"
+    },
+    {
+      "intent": "books_and_fiction_chat",
+      "visitor_signals": ["聊刘慈欣 / 三体", "聊村上春树", "聊凡尔纳", "聊百年孤独 / 马尔克斯", "聊鲁鲁修 / 反逆的鲁鲁修", "聊韩寒", "找同好聊科幻或文学"],
+      "read_files": ["identity.md"],
+      "fetch_nodes": ["identity.favorite_authors", "identity.favorite_works"],
+      "match_on": "identity.favorite_authors[] / identity.favorite_works[]",
+      "why_matched": "他的作家与作品清单：刘慈欣、韩寒、村上春树、凡尔纳；《百年孤独》、《反逆的鲁鲁修》。",
+      "value_hook": "他欢迎对《鲁鲁修》的解读交流。共同点是「个体在既定结构里做取舍」这一母题。",
+      "constraints": [
+        "纯兴趣向，非可交换资源 —— 不要列为技能或物品需求",
+        "《百年孤独》他只读得深这一本，其余马尔克斯作品未读"
+      ],
       "priority": "low"
     },
     {
@@ -167,7 +181,7 @@
     }
   ],
   "wants_index": [
-    "投资配置逻辑的反驳与讨论",
+    "投资配置逻辑的讨论",
     "银行/交运/消费链条的行业真实信息",
     "人体工学椅桌横向对比",
     "3D 打印现状（是否值得再试光固化）",

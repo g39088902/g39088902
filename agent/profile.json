@@ -1,7 +1,7 @@
 {
   "$schema": "./schema.md",
   "schema_version": "1.0",
-  "updated_at": "2026-10-08",
+  "updated_at": "2026-10-09",
   "owner": {
     "display_name": "小凡",
     "alias": "Empathy",
@@ -54,6 +54,23 @@
       "城市天际线",
       "边缘世界",
       "微软模拟飞行"
+    ],
+    "favorite_authors": [
+      "刘慈欣",
+      "韩寒",
+      "村上春树",
+      "儒勒·凡尔纳"
+    ],
+    "favorite_works": [
+      {
+        "title": "百年孤独",
+        "creator": "加西亚·马尔克斯",
+        "type": "novel"
+      },
+      {
+        "title": "反逆的鲁鲁修",
+        "type": "anime"
+      }
     ],
     "dietary": {
       "hard_avoid": [
@@ -174,7 +191,7 @@
     "reading_articles"
   ],
   "wants": [
-    "投资配置逻辑的反驳与讨论",
+    "投资配置逻辑的讨论",
     "银行/交运/消费链条的行业真实信息",
     "人体工学椅桌横向对比",
     "3D 打印现状（是否值得再试光固化）",

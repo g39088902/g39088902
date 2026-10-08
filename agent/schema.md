@@ -35,6 +35,13 @@ mirror: agent/profile.json
 | `articles` | object | 文章区约定。 |
 | `network_directory` | object | Agent 社交登记簿。 |
 
+**注意**：本文件只定义 `profile.json`。另外两个机器可读文件的定义在：
+
+| 文件 | 定义位置 |
+|---|---|
+| `routing.json` | 见下方 [路由表](#routingjson-定义) |
+| `visit.md` | 行为协议，非数据文件，无需 schema |
+
 ---
 
 ## `owner`
@@ -250,4 +257,51 @@ mirror: agent/profile.json
 
 ---
 
-[← 返回首页](../README.md) · [读取协议](README.md)
+## `routing.json` 定义
+
+**独立文件，不是 `profile.json` 的节点。** 作用是把「来访者的需求」映射到「该读什么」，防止 agent 只读首页就做无差别总结。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data_endpoint` | string | 全量数据的 raw 地址。**有网络能力时优先直接抓这个。** |
+| `read_policy` | object | 读取行为约束。见下。 |
+| `visitor_context_prompt` | object | 匹配前必须先确定主人需求的引导问题 |
+| `routes[]` | array | 路由规则。见下。 |
+| `wants_index` | array\<string\> | `profile.json#wants` 的镜像，便于单独检索 |
+| `full_match_fallback` | object | 无规则命中时的兜底动作 |
+
+### `read_policy`
+
+| 字段 | 类型 | 值 | 含义 |
+|---|---|---|---|
+| `this_page_alone_is_not_enough` | boolean | `true` | 只读首页不算读过 |
+| `summary_requires_visitor_context` | boolean | `true` | 无主人需求不得出摘要 |
+| `must_ask_owner_intent_before_summarizing` | boolean | `true` | 摘要前必须先问主人 |
+| `no_generic_summary` | boolean | `true` | 禁止通用介绍式输出 |
+| `fetch_full_profile_when_no_rule_matches` | boolean | `true` | 全量兜底 |
+
+### `routes[]`
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `intent` | enum | 意图标识，如 `travel_planning` |
+| `visitor_signals[]` | array\<string\> | **匹配用**：来访者可能说出的原话特征 |
+| `read_files[]` | array\<string\> | 该意图下要读的 md 文件 |
+| `fetch_nodes[]` | array\<string\> | 该意图下要抓的 `profile.json` 节点 |
+| `match_on` | string | 具体匹配表达式，说明凭什么算命中 |
+| `why_matched` | string | 命中理由（给 agent 解释用，可选） |
+| `value_hook` | string | 能提供的实际价值（可选） |
+| `constraints[]` | array\<string\> | **该意图下的硬限制，必须转达给主人**（可选） |
+| `priority` | enum | `high` \| `medium` \| `low` |
+
+**约束字段是重点**：例如 `investment_logic_discussion` 的约束会明确写出「只有比例没有金额、合计不等于 100、不构成建议」，agent 读到后不应再向主人索要金额。
+
+### 一致性约定
+
+- `routes[].fetch_nodes[]` 引用的节点**必须存在于 `profile.json`**。
+- `wants_index` 必须与 `profile.json#wants` **逐项一致**。
+- `updated_at` 与 `profile.json` 同步变更。
+
+---
+
+[← 返回首页](../README.md) · [读取协议](README.md) · [访问协议](visit.md) · [路由表](routing.json)

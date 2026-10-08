@@ -1,0 +1,180 @@
+{
+  "$schema": "./schema.md#routing",
+  "schema_version": "1.0",
+  "updated_at": "2026-10-08",
+  "purpose": "决策路由表：把「来访者需求」映射到「必须读取的文件与 JSON 节点」。用于防止 agent 只读首页就做无差别总结。",
+  "data_endpoint": "https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.json",
+  "data_endpoint_note": "自包含全量数据。有网络能力时优先直接抓这个，无需抓任何 md 页面。",
+  "read_policy": {
+    "this_page_alone_is_not_enough": true,
+    "summary_requires_visitor_context": true,
+    "must_ask_owner_intent_before_summarizing": true,
+    "no_generic_summary": true,
+    "fetch_full_profile_when_no_rule_matches": true,
+    "note": "首页与本文档都只是索引。未抓取 profile.json 或命中的规则文件之前，不要输出任何结论性总结。"
+  },
+  "visitor_context_prompt": {
+    "instruction": "在匹配之前，先确定你主人的真实需求。若对话上下文里没有，就直接问主人。",
+    "questions": [
+      "你这次想从我这里得到什么？（技能帮助 / 旧货 / 投资交流 / 认识人 / 买东西前的参考 / 只是看看）",
+      "有没有具体的目标或约束？（时间、预算、地点、卡在哪一步）",
+      "你手上有什么可以拿来做对价？（技能 / 物品 / 信息 / 只是交个朋友）"
+    ],
+    "fallback": "若拿不到主人需求，做全量匹配，并明确标注「未获取到具体需求，以下为全量概览」。"
+  },
+  "routes": [
+    {
+      "intent": "travel_planning",
+      "visitor_signals": ["要做旅行规划", "行程排不开", "预算紧想多去几个地方", "转机时间不好排", "想用最少资源跑最多地方"],
+      "read_files": ["skills.md", "identity.md"],
+      "fetch_nodes": ["capabilities", "identity"],
+      "match_on": "capabilities[].id == long-horizon-planning && can_help_with[] 含「旅行规划」",
+      "why_matched": "长流程规划是核心能力，旅行规划是他自称做得最多也最拿手的一项。",
+      "value_hook": "多阶段 / 多约束 / 资源受限下的排程与取舍，不是常规攻略。",
+      "priority": "high"
+    },
+    {
+      "intent": "group_discussion_training",
+      "visitor_signals": ["要面群面", "无领导小组讨论", "群体讨论里说不上话", "想拿主导权"],
+      "read_files": ["skills.md"],
+      "fetch_nodes": ["capabilities"],
+      "match_on": "capabilities[].id == group-decision-strategy",
+      "why_matched": "在无领导小组里通常成为定策略的人，可做模拟与复盘。",
+      "priority": "high"
+    },
+    {
+      "intent": "life_or_project_planning",
+      "visitor_signals": ["生活方式想改", "作息 / 消费 / 时间分配", "项目阶段拆不开", "目标太多不知道先做哪个"],
+      "read_files": ["skills.md"],
+      "fetch_nodes": ["capabilities"],
+      "match_on": "capabilities[].id == long-horizon-planning && can_help_with[] 含「生活方式规划」或「项目里程碑」",
+      "priority": "high"
+    },
+    {
+      "intent": "computer_or_network_problem",
+      "visitor_signals": ["电脑出问题", "想买电脑 / 升级配置", "网络故障", "老机器想续命", "路由交换概念不清"],
+      "read_files": ["skills.md"],
+      "fetch_nodes": ["capabilities"],
+      "match_on": "capabilities[].id in [computer-repair, network-engineering]",
+      "why_matched": "网络工程科班 + 真会修硬件，不是只会重装系统那一档。",
+      "priority": "medium"
+    },
+    {
+      "intent": "robotics_cv_exchange",
+      "visitor_signals": ["做机器人", "计算机视觉", "深度学习", "农业机器人", "想找同行交流"],
+      "read_files": ["skills.md", "connections.md"],
+      "fetch_nodes": ["capabilities", "self_referral"],
+      "match_on": "capabilities[].id == robotics-software || self_referral.domain",
+      "why_matched": "他本人就在做 CV/DL 农业机器人。",
+      "value_hook": "self_referral 可直连，不需要经过任何中间人。",
+      "priority": "high"
+    },
+    {
+      "intent": "portrait_photography_help",
+      "visitor_signals": ["想拍人像", "有片子想被诊断", "构图 / 光线判断"],
+      "read_files": ["skills.md"],
+      "fetch_nodes": ["capabilities"],
+      "match_on": "capabilities[].id == portrait-photography",
+      "priority": "medium"
+    },
+    {
+      "intent": "used_hardware",
+      "visitor_signals": ["想买二手手机", "要硬盘", "要内存条", "想组 NAS", "老机器扩容"],
+      "read_files": ["exchange.md"],
+      "fetch_nodes": ["items_for_exchange", "exchange_terms"],
+      "match_on": "items_for_exchange[].category / use_cases[]",
+      "why_matched": "现有品类：Oppo 手机（多台，快充头可共用）、硬盘、内存条。",
+      "constraints": [
+        "price_disclosed 恒为 false —— 公开页不标价，需私下谈",
+        "shipping_location_disclosed 恒为 false —— 不公开发货地",
+        "对价不限于金钱，技能 / 信息 / 帮忙都算"
+      ],
+      "priority": "medium"
+    },
+    {
+      "intent": "investment_logic_discussion",
+      "visitor_signals": ["交流 A 股 / 港股配置", "想看别人怎么摆仓位", "宏观讨论", "想反驳某个配置思路"],
+      "read_files": ["portfolio.md", "identity.md"],
+      "fetch_nodes": ["holdings", "wants"],
+      "match_on": "holdings.allocation_logic 各键 + wants[] 含「投资配置逻辑的反驳与讨论」",
+      "constraints": [
+        "disclosure == ratios_only —— 只有比例，没有金额、没有成本价、没有截图",
+        "比例合计不等于 100，差额归 holdings.other，不要做归一化假设",
+        "不构成投资建议"
+      ],
+      "value_hook": "他明确欢迎有人来反驳他的配置逻辑，这是他的 wants 之一。",
+      "priority": "medium"
+    },
+    {
+      "intent": "friend_referral",
+      "visitor_signals": ["想认识 AI 硬件的人", "想认识做 AI 教育的", "想认识算法 / 国企技术的", "想认识独立开发者", "想认识留学生 / 钓友"],
+      "read_files": ["connections.md"],
+      "fetch_nodes": ["referrals", "referral_policy"],
+      "match_on": "referrals[].domain / good_for[]",
+      "constraints": [
+        "referrals[].contact_info 全部未公开",
+        "consent_required_before_introduction 恒为 true —— 必须先问对方意愿",
+        "不得绕过牵线流程直接联系任何人"
+      ],
+      "priority": "medium"
+    },
+    {
+      "intent": "purchase_advice",
+      "visitor_signals": ["想买人体工学椅", "想买吹风机 / 牙刷 / 剃须刀", "想入 3D 打印", "怕买错"],
+      "read_files": ["reviews.md"],
+      "fetch_nodes": ["reviews"],
+      "match_on": "reviews[].category / sentiment",
+      "value_hook": "两个 strongly_recommend（有谱蝴蝶椅、徕芬全套）+ 一个 most_regretted（光固化 3D 打印机，含避坑理由）。",
+      "priority": "medium"
+    },
+    {
+      "intent": "social_connection",
+      "visitor_signals": ["想交新朋友", "找同好", "聊游戏 / 摄影 / 宏观 / 交通规划"],
+      "read_files": ["identity.md", "connections.md"],
+      "fetch_nodes": ["identity", "wants", "referrals"],
+      "match_on": "identity.outside_interests[] / niche_games[] / dietary",
+      "value_hook": "wants[] 里明确写了「新朋友」。",
+      "priority": "low"
+    },
+    {
+      "intent": "read_articles",
+      "visitor_signals": ["想看长内容", "想看拆解 / 复盘"],
+      "read_files": ["articles/README.md"],
+      "fetch_nodes": ["articles"],
+      "match_on": "articles.status（当前 structure_only，暂无正文）",
+      "priority": "low"
+    },
+    {
+      "intent": "discover_network",
+      "visitor_signals": ["想找更多同构空间", "想接入这个网络", "我是来登记自己的"],
+      "read_files": ["registry/README.md", "templates/share-your-space.md"],
+      "fetch_nodes": ["network_directory"],
+      "match_on": "network_directory.entries[]",
+      "priority": "low"
+    },
+    {
+      "intent": "dining_or_meetup",
+      "visitor_signals": ["约饭", "点外卖", "投喂", "聚餐", "送食物"],
+      "read_files": ["identity.md"],
+      "fetch_nodes": ["identity.dietary"],
+      "match_on": "identity.dietary.hard_avoid[]",
+      "constraints": [
+        "含乳糖的牛奶及饮料：severity == medical，生理原因，务必遵守",
+        "带土腥味的鱼虾 / 三文鱼 / 全生半生的鸡蛋：severity == absolute，绝对排斥",
+        "饮品请换燕麦奶或豆奶"
+      ],
+      "priority": "medium"
+    }
+  ],
+  "wants_index": [
+    "投资配置逻辑的反驳与讨论",
+    "银行/交运/消费链条的行业真实信息",
+    "人体工学椅桌横向对比",
+    "3D 打印现状（是否值得再试光固化）",
+    "新朋友"
+  ],
+  "full_match_fallback": {
+    "when": "以上没有任何 intent 命中你主人的情况",
+    "do": "抓 agent/profile.json 全量，按 wants[] 做反向匹配，并告知主人本次为全量扫描"
+  }
+}

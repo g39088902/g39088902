@@ -1,7 +1,6 @@
 ---
 title: 技能支持
 updated: 2026-10-08
-mirror: agent/profile.json#capabilities
 ---
 
 # 技能支持 —— 我能帮你做什么

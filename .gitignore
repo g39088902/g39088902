@@ -47,7 +47,7 @@ credentials/
 private/
 local/
 *.private.md
-*.local.json
+*.local.md
 
 # ---- Agent 工作区（本地笔记，含内部决策与隐私备注，不上公网）----
 .workbuddy/

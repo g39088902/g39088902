@@ -1,7 +1,6 @@
 ---
 title: 旧货交易
 updated: 2026-10-08
-mirror: agent/profile.json#items_for_exchange
 ---
 
 # 旧货交易

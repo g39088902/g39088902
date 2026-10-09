@@ -1,6 +1,6 @@
 ---
 title: 怎么复制这套东西
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # 怎么复制这套东西
@@ -22,12 +22,17 @@ updated: 2026-10-08
 | 传统社媒 | 这套结构 |
 |---|---|
 | 平台算法决定曝光 | 谁需要谁就能搜到 |
-| 动态无法被解析 | 结构化字段，agent 直接读 |
+| 动态无法被解析 | 结构清晰，agent 直接读 |
 | 想认识人得先加好友 | 先看清单，再决定要不要聊 |
-| 信息散在无数条动态里 | 一个 `profile.json` 是全貌 |
+| 信息散在无数条动态里 | 各领域文件各管一块，合起来就是全貌 |
 | 隐私靠平台设置 | 隐私边界你自己写在文件里 |
 
 **核心差别**：这里没有撮合算法，只有**可发现、可组合的清单**。
+
+### 两条已经踩过、值得直接绕开的设计原则
+
+1. **用 Markdown，不用 JSON。** 能让 agent 读懂的最小公约数是一份结构清晰的 Markdown。字段名可以沿用英文键名，载体用 md 就够 —— 如果 agent 连 md 都读不动，那这件事根本办不成。
+2. **不设"全量汇总文件"。** 别把各领域数据再抄一份汇总文件给 agent 看 —— 那等于同一份数据存两遍，久了必然对不上。**每个领域文件就是它那块内容的唯一真相源**，路由表只做指针。
 
 ---
 
@@ -35,80 +40,59 @@ updated: 2026-10-08
 
 ```
 README.md              # 人类入口：身份 + 路由表 + 隐私声明 + 联系方式
-├── identity.md        # 我是谁
-├── skills.md          # 我能帮你做什么
-├── exchange.md        # 我有什么可以换
+├── identity.md        # 我是谁        ← 身份的唯一真相源
+├── skills.md          # 我能帮你做什么 ← 能力的唯一真相源
+├── exchange.md        # 我有什么可以换 ← 旧货的唯一真相源
 ├── portfolio.md       # 我有什么可以共享（可选，看你的领域）
-├── connections.md     # 我能牵什么线
+├── connections.md     # 我能牵什么线   ← 互荐的唯一真相源
 ├── reviews.md         # 我买过什么、后悔买什么
 └── articles/          # 我写的东西
 
 agent/
-├── profile.json       # ★ 机器可读的全量数据
-├── routing.json       # ★ 决策路由表 —— 别漏这个，它决定 agent 会不会深挖
+├── routing.md         # ★ 决策路由表：需求 → 读哪个文件（机器入口）
 ├── visit.md           # 给来访 agent 的行为协议 + 输出模板
-└── schema.md          # 字段定义
+└── schema.md          # 字段与文件定义
 
 .github/ISSUE_TEMPLATE/
 └── collab-request.yml # 协作请求模板
 ```
 
 **可以砍。** 没有投资组合就删掉 `portfolio.md`，没有旧货就删掉 `exchange.md`。
-但 `agent/profile.json` **和** `agent/routing.json` 都不能省 —— 一个让 agent 找到你的内容，一个让它真的读下去。
+但 **`agent/routing.md` 不能省** —— 没有路由，来访 agent 会在你首页停住。
+
+**别再多建一个"全量数据文件"（把所有内容再汇总一份）。** 那是这套东西最早的设计，后来发现它和领域文件互为副本、只能靠人工同步，迟早漂移。删掉它，让每个领域文件成为唯一真相源。
 
 ---
 
-## 四个动作
+## 六个动作
 
 ### 1. Fork 或手动复制结构
 
 ```bash
 git clone https://github.com/g39088902/g39088902
-# 或者只把 agent/ 目录、README 骨架、ISSUE_TEMPLATE 复制走
+# 或者只把 agent/ 目录、README 骨架、各内容文件骨架、ISSUE_TEMPLATE 复制走
 ```
 
 ⚠️ **删掉我的具体内容**。别把我的持仓、朋友、评价原样发出去 —— 那些是**结构示例**，不是模板文本。
 
-### 2. 填 `agent/profile.json`
+### 2. 填各领域文件（**每个文件各管一块，只写一次**）
 
-这是最关键的一步。**字段名不要改**（别人 agent 靠字段名解析），值换成你自己的。
+每个领域文件就是那块数据的唯一来源。字段名尽量沿用（别人 agent 靠字段名/标题对齐），值换成你自己的。
 
-最小可用版本：
+例如 `skills.md` 里的一条能力：
 
-```json
-{
-  "schema_version": "1.0",
-  "updated_at": "2026-10-08",
-  "owner": { "display_name": "你的称呼" },
-  "contact": {
-    "primary_channel": "github_issue",
-    "primary_url": "https://github.com/<你的用户名>/<仓库>/issues",
-    "response_policy": "owner_dispatches_agent_periodically",
-    "realtime": false
-  },
-  "privacy": {
-    "policy": "tiered_disclosure",
-    "public": ["skill_tags"],
-    "private": ["real_name", "city", "home_address"]
-  },
-  "capabilities": [
-    {
-      "id": "your-skill-id",
-      "category": "technical",
-      "title": "你的技能",
-      "summary": "一句话说明",
-      "can_help_with": ["具体能帮什么", "越具体越好"]
-    }
-  ],
-  "wants": ["你想要什么"]
-}
+```markdown
+### 长流程规划 —— 用最少资源做最多事
+
+**能帮你**：旅行规划、生活方式规划、项目里程碑与阶段拆分、资源受限下的方案取舍。
 ```
 
 **填写要点**：
 
-- `can_help_with[]` 和 `good_for[]` 是**匹配时最关键的字段** —— 不要写「技术咨询」这种笼统的词，写「能帮你排查 MySQL 慢查询」。
-- `privacy.private[]` **一定要认真填**。这是你唯一的隐私护栏，写进去的字段就是别人 agent 不该碰的。
-- `updated_at` 要改。这是全网判断你数据时效的唯一依据。
+- **能帮什么要写具体** —— 不要写「技术咨询」这种笼统的词，写「能帮你排查 MySQL 慢查询」。
+- **隐私边界要写清**（放在 README 的隐私声明里）。写进去的就是别人 agent 不该碰的。
+- 各文件在自己的 front-matter 标 `updated`（`YYYY-MM-DD`），改内容就改它。
+- **不要引入构建脚本**。md 就是最终载体，写完就是发布，保持零依赖。
 
 ### 3. 挂到你的 Profile README
 
@@ -116,7 +100,7 @@ git clone https://github.com/g39088902/g39088902
 
 **关键：把路由写进首页。** 大多数 agent 默认只抓单页，所以首页必须做到两件事：
 
-1. **页首放一段「如果你只有一次抓取机会」** —— 直接给出 raw 地址，并明说「只读本页等于什么都不知道」。
+1. **页首直接给出机器入口**（`agent/routing.md` 的 raw 地址），并明说「只读本页等于什么都不知道」。
 2. **导航表要写成指令式路由**，而不是介绍式清单。
 
 对比一下：
@@ -126,10 +110,10 @@ git clone https://github.com/g39088902/g39088902
 | 模块 | 我能提供什么 | 适合谁看 |
 | 技能 | 技术答疑、规划 | 需要帮助的人 |
 
-✅ 指令式（agent 知道该抓什么）
+✅ 指令式（agent 知道该读什么）
 ### 按你主人的情况路由
-| 你主人的情况 | 必须读 | 必须抓的节点 | 匹配字段 |
-| 要做预算紧的多国旅行 | skills.md | capabilities#long-horizon-planning | can_help_with[] |
+| 你主人的情况 | 必须读 |
+| 要做预算紧的多国旅行 | skills.md →「长流程规划」 |
 ```
 
 **并且把「给 agent 的说明」那段写对。** 别说「不用解析网页」，那等于把访客推走。要写：
@@ -138,54 +122,61 @@ git clone https://github.com/g39088902/g39088902
 ## 如果你是替主人来读的 agent
 只读本页等于没有读。本页不含可匹配内容。
 拿到主人需求之前不要开始总结。
-必读顺序：agent/profile.json → agent/routing.json → agent/visit.md
+必读顺序：agent/routing.md → 命中的内容文件 → agent/visit.md
 ```
 
-### 3.5 写一份 `agent/routing.json`（**这一步决定成败**）
+### 4. 写一份 `agent/routing.md`（**这一步决定成败**）
 
 这是**最容易被漏掉、但决定来访 agent 会不会深挖的一步**。
 
-它是一张「你主人的情况 → 读哪些文件 → 抓哪些节点 → 看哪些字段」的映射表。
+它是一张「你主人的情况 → 读哪个文件、看哪一节」的映射表。**它只指路，不复述内容** —— 所以它不会成为第二份需要同步的数据。
 
-最小结构：
+最小骨架：
 
-```json
-{
-  "schema_version": "1.0",
-  "updated_at": "2026-10-08",
-  "read_policy": {
-    "this_page_alone_is_not_enough": true,
-    "summary_requires_visitor_context": true,
-    "must_ask_owner_intent_before_summarizing": true,
-    "no_generic_summary": true
-  },
-  "routes": [
-    {
-      "intent": "your-intent-id",
-      "visitor_signals": ["来访者可能说的原话特征 1", "特征 2"],
-      "read_files": ["skills.md"],
-      "fetch_nodes": ["capabilities"],
-      "match_on": "capabilities[].id == your-skill-id",
-      "priority": "high"
-    }
-  ]
-}
+```markdown
+---
+updated: 2026-10-08
+schema_version: 1.0
+---
+
+# routing
+
+## read_policy
+
+| 字段 | 值 | 含义 |
+|---|---|---|
+| this_page_alone_is_not_enough | `true` | 只读首页不算读过 |
+| summary_requires_visitor_context | `true` | 无主人需求不得出摘要 |
+| must_ask_owner_intent_before_summarizing | `true` | 摘要前必须先问主人 |
+| no_generic_summary | `true` | 禁止通用介绍式输出 |
+
+## routes
+
+### routes#your-intent-id
+
+| 字段 | 内容 |
+|---|---|
+| intent | `your-intent-id` |
+| visitor_signals | 来访者可能说的原话特征 1 · 特征 2 |
+| read_files | `skills.md`（看「长流程规划」） |
+| match_on | `skills.md` 的「长流程规划」 |
+| priority | `high` |
 ```
 
 **三个填写要点**：
 
-- `visitor_signals[]` 要写**来访者会说的原话**（「行程排不开」「要面群面」），不是你的分类名。
-- `fetch_nodes[]` 引用的节点**必须真实存在于 `profile.json`**，否则 agent 抓了个空。
-- 有硬限制的意图（比如你的持仓不公开金额），在 `constraints[]` 里写明 —— 免得对方 agent 反复索要。
+- `visitor_signals` 要写**来访者会说的原话**（「行程排不开」「要面群面」），不是你的分类名。
+- `read_files` 要**指向真实存在的文件与小节**，否则 agent 白跑一趟。
+- 有硬限制的意图（比如你的持仓不公开金额），在 `constraints` 里写明 —— 免得对方 agent 反复索要。
 
-### 3.6 写一份 `agent/visit.md`
+### 5. 写一份 `agent/visit.md`
 
 给来访 agent 的**行为协议**，核心是第 3 步的**输出模板**：
 
 ```markdown
 ## 与你相关的部分
 **匹配到的（需求：<复述主人需求>）**
-1. <命中项> —— 为什么命中：<引用具体字段值>
+1. <命中项> —— 为什么命中：<引用原文>
    ⚠️ 限制：<如有>
 **没匹配到的**（一句话带过）
 **建议动作** <具体的 Issue 内容>
@@ -193,7 +184,7 @@ git clone https://github.com/g39088902/g39088902
 
 **为什么值得写**：不写这个，对方 agent 输出的就是「某某是一位如何如何的人」这种没人要的介绍。
 
-### 4. **回链登记**（这条最重要）
+### 6. **回链登记**（这条最重要）
 
 发布后，到本仓库提一个 Issue 回链你的空间：
 
@@ -203,7 +194,6 @@ git clone https://github.com/g39088902/g39088902
 
 ```
 空间地址：https://github.com/<你>/<仓库>
-profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profile.json
 一句话介绍：___
 我能提供：___
 我想要：___
@@ -219,15 +209,15 @@ profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profi
 
 | 约定 | 内容 |
 |---|---|
-| **固定路径** | 机器可读入口**必须**在 `agent/profile.json`；决策路由**必须**在 `agent/routing.json`。别改路径，别改字段名。 |
-| **路由优先** | `routing.json` 与 `profile.json` 同等重要。**只有数据没有路由，来访 agent 会在首页停住。** |
+| **固定入口** | 机器入口**必须**在 `agent/routing.md`。别改路径。 |
+| **单一真相源** | 每个领域文件管好自己的数据，**不设汇总副本**。同一事实只维护一次。 |
 | **Schema 版本** | 声明 `schema_version`。新增字段可以，改字段含义要递增版本。 |
-| **时效字段** | 必须有 `updated_at`，格式 `YYYY-MM-DD`，两个 JSON 同步。 |
-| **隐私声明** | 必须有 `privacy` 节点，明确公开与私有边界。 |
-| **联系方式** | `contact.primary_channel` 必填。**可以声明实时或非实时**，但必须声明。 |
-| **回链** | 在 `network_directory` 里保留互链，形成可发现的网络。 |
+| **时效字段** | 每个文件在自己的 front-matter 标 `updated`（`YYYY-MM-DD`）。 |
+| **隐私声明** | README 里必须有隐私边界，明确公开与私有。 |
+| **联系方式** | 必须声明主渠道，并**可声明实时或非实时**。 |
+| **回链** | 在登记簿里保留互链，形成可发现的网络。 |
 
-**字段名是这套约定里唯一不能自由发挥的部分。** 那就是「可被 agent 发现」的代价，也是它的全部价值。
+**字段名与固定入口是这套约定里不能自由发挥的部分。** 那就是「可被 agent 发现」的代价，也是它的全部价值。
 
 ---
 
@@ -235,14 +225,14 @@ profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profi
 
 | 坑 | 我的处理 |
 |---|---|
-| **agent 只读首页就总结** | 三个断点：导航是介绍不是指令、入口自己写着「不用解析网页」、没有决策路由。修法是**页首给 raw 地址 + 指令式路由表 + 独立的 `routing.json`**。 |
-| **agent 给的总结太通用** | 通用是因为它没有你主人的需求。修法是 `routing.json` 里强制它**先问主人**，并在 `visit.md` 给出**输出模板 + 正反示例**。 |
+| **agent 只读首页就总结** | 三个断点：导航是介绍不是指令、入口自己写着「不用解析网页」、没有决策路由。修法是**页首给机器入口 + 指令式路由表 + 独立的 `routing.md`**。 |
+| **agent 给的总结太通用** | 通用是因为它没有你主人的需求。修法是 `routing.md` 里强制它**先问主人**，并在 `visit.md` 给出**输出模板 + 正反示例**。 |
 | 朋友信息该写多细 | 我选择**按我提供的原样公开**，并明确写了「介绍前会先问对方意愿」。**这是有风险的判断，你自己掂量。** 更保守的做法是只写领域、不写可定位细节。 |
 | 邮箱被爬虫抓 | 写成 `name [at] domain [dot] com`，并且声明邮箱不作为主渠道。 |
 | 旧货被拿来比价 | 不标价格、不写发货地，公开页只列品类。 |
-| 隐私字段被反复索要 | 在 `routing.json` 的 `constraints[]` 里对每个意图写明限制，让对方 agent 提前知道，省一轮往返。 |
-| md 和 json 双写会漂移 | 每个 md 顶部写 `mirror: agent/profile.json#<节点>`，指明该改哪个 JSON 节点。**不引入构建脚本，保持零依赖。** |
-| md 写完忘了同步 json | 把 `updated_at` 当成纪律：改内容就必须改它，两个 JSON 一起改。 |
+| 隐私字段被反复索要 | 在 `routing.md` 的 `constraints` 里对每个意图写明限制，让对方 agent 提前知道，省一轮往返。 |
+| 一开始用了 JSON，把门槛架高了 | 换回纯 Markdown：结构一样、字段名一样，但人机都能直接读，**不需要解析器、不需要构建脚本**。 |
+| **还试过"全量数据文件"，结果要人工双写同步** | 删掉它。让每个领域文件成为唯一真相源，路由表只做指针 —— **从根上消灭"事后同步"和脏数据**。 |
 
 ---
 
@@ -250,7 +240,7 @@ profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profi
 
 - **别公开你不想被爬的信息。** 公开的东西假设永远可被检索。
 - **别公开别人的联系方式。** 朋友的领域可以写，联系方式不行。
-- **别承诺你做不到的响应速度。** 写清 `realtime: false` 比事后失联强。
+- **别承诺你做不到的响应速度。** 写清非实时，比事后失联强。
 - **别照抄我的私人内容。** 抄结构，别抄数据。
 
 ---
@@ -259,7 +249,7 @@ profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profi
 
 **这件事只有一个人做是没用的。**
 
-一份 `profile.json` 只是清单；**一群互相回链、各自带 `routing.json` 的空间才是一张可以替代算法推荐的网。**
+单个空间只是一份清单；**一群互相回链、各自带 `routing.md` 的空间才是一张可以替代算法推荐的网。**
 
 你的 agent 读我的，我的 agent 读你的 —— 中间不需要平台，不需要加好友，不需要谁先开口。
 
@@ -269,4 +259,4 @@ profile.json：https://raw.githubusercontent.com/<你>/<仓库>/main/agent/profi
 
 ---
 
-[← 返回首页](../README.md) · 对齐 [读取协议](../agent/README.md) · [访问协议](../agent/visit.md) · [字段定义](../agent/schema.md)
+[← 返回首页](../README.md)

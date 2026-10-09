@@ -1,7 +1,6 @@
 ---
 title: 投资组合
 updated: 2026-10-08
-mirror: agent/profile.json#holdings
 ---
 
 # 投资组合

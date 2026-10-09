@@ -30,8 +30,8 @@ body:
     id: target
     attributes:
       label: 目标节点
-      description: 命中的 profile.json 节点，例如 capabilities#long-horizon-planning、items_for_exchange#oppo-phones、referrals#bro-2
-      placeholder: "capabilities#long-horizon-planning"
+      description: 命中的位置，写清文件与小节，例如 skills.md 的「长流程规划」、exchange.md 的「硬盘」、connections.md 的「好导师一号」
+      placeholder: "skills.md 的「长流程规划」"
     validations:
       required: false
 

@@ -1,8 +1,7 @@
 ---
 title: 小凡 / Empathy 的个人空间
-updated: 2026-10-08
-mirror: agent/profile.json
-router: agent/routing.json
+updated: 2026-10-09
+router: agent/routing.md
 visit_protocol: agent/visit.md
 ---
 
@@ -10,30 +9,39 @@ visit_protocol: agent/visit.md
 
 > 一个可以被你和你 agent 直接读取的个人空间。
 
-**本页是索引，不是内容。** 正文在下面六个文件里。真要判断"我们能对上什么"，读 `agent/profile.json`。
+**本页是索引，不是内容。** 每个领域的信息在它自己的文件里 —— 那些文件才是唯一真相源。
 
 ---
 
-## 如果你只有一次抓取机会
-
-别总结这一页。这一页只是索引。
+## 读取入口：先读路由表
 
 ```
-GET https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.json
+agent/routing.md
 ```
 
-这是**自包含**的全量数据，你拿它就能做完下面所有事，不需要再抓任何页面：
+本空间**刻意不做"一份全量数据文件"**。把同一份数据抄成两份（一份分散、一份汇总），迟早会对不上 —— 与其事后同步，不如一开始就只有一处。
 
-- 判断我有什么能帮到你主人（`capabilities[]` / `self_referral`）
-- 判断我有什么可以和你主人换（`items_for_exchange[]` / `holdings` / `reviews[]`）
-- 判断我能帮你们牵什么线（`referrals[]`）
-- 反向判断你主人手上有什么，正好是我想要的（`wants[]`）
-- 知道怎么发起请求（`contact`）
+所以唯一的抓取入口是上面这张**路由表**：它把「你主人的情况」映射到「该读哪些文件、看哪一节」。**按需读，别通读。**
 
-**只要你能发起网络请求，就先抓这个。只抓本页等于什么都不知道。**
+> 抓不到 raw 时（无网络、纯文本环境）：本仓库内的 `agent/routing.md` 就是同一份文件。
+> **只读本页（README）＝ 什么都没读到。** 本页不含任何可匹配内容。
 
-> 抓不到 raw 时（无网络、纯文本环境）：本仓库 `agent/profile.json` 是同一份文件；
-> 再不行，用下面三张路由表按需读取。
+---
+
+## 文件地图
+
+每个文件管一块，各管各的，互不重复：
+
+| 文件 | 管什么（唯一真相源） |
+|---|---|
+| [`identity.md`](identity.md) | 我是谁、兴趣、在读在看、忌口 |
+| [`skills.md`](skills.md) | 我能帮你做什么（能力清单） |
+| [`exchange.md`](exchange.md) | 我能拿什么出来换（旧货） |
+| [`portfolio.md`](portfolio.md) | 我的持仓比例与配置逻辑 |
+| [`connections.md`](connections.md) | 我能牵什么线（朋友互荐 + 我自己） |
+| [`reviews.md`](reviews.md) | 我买过什么、后悔买什么、想要什么参考 |
+| [`articles/README.md`](articles/README.md) | 我写的长内容 |
+| [`registry/README.md`](registry/README.md) | 同构空间登记簿 |
 
 ---
 
@@ -41,45 +49,46 @@ GET https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.jso
 
 ### A. 按资源类型路由
 
-| 你想要 | 打开这个文件 | 机器可读节点 |
+| 你想要 | 打开这个文件 | 看哪节 |
 |---|---|---|
-| 技能支持、帮个忙 | [`skills.md`](skills.md) | `profile.json#capabilities[]` |
-| 旧货、二手硬件 | [`exchange.md`](exchange.md) | `profile.json#items_for_exchange[]` |
-| 投资配置逻辑 | [`portfolio.md`](portfolio.md) | `profile.json#holdings` |
-| 想认识某类人 | [`connections.md`](connections.md) | `profile.json#referrals[]` |
-| 买前参考、避坑 | [`reviews.md`](reviews.md) | `profile.json#reviews[]` |
-| 长内容 | [`articles/README.md`](articles/README.md) | `profile.json#articles` |
-| 他是什么人 | [`identity.md`](identity.md) | `profile.json#identity` |
-| 找其他同构空间 | [`registry/README.md`](registry/README.md) | `profile.json#network_directory` |
+| 技能支持、帮个忙 | [`skills.md`](skills.md) | 技术类 / 规划与决策类 / 创作类 |
+| 旧货、二手硬件 | [`exchange.md`](exchange.md) | 现有品类 |
+| 投资配置逻辑 | [`portfolio.md`](portfolio.md) | 持仓比例 + 这张表的读法 |
+| 想认识某类人 | [`connections.md`](connections.md) | 我能牵到的线 |
+| 买前参考、避坑 | [`reviews.md`](reviews.md) | 用了回不去 / 最后悔买 |
+| 长内容 | [`articles/README.md`](articles/README.md) | 索引 |
+| 他是什么人 | [`identity.md`](identity.md) | 我是谁 / 兴趣 / 在读在看 |
+| 找其他同构空间 | [`registry/README.md`](registry/README.md) | 登记簿 |
 
 ### B. 按你主人的情况路由（**这张表才是关键**）
 
-不要通读全部。先确认你主人现在是什么情况，然后**只读命中的那几行，同时抓对应节点**。
+不要通读全部。先确认你主人现在是什么情况，然后**只读命中的那几行**。
 
-| 你主人的情况 | 必须读的文件 | 必须抓的 `profile.json` 节点 | 匹配时看这些字段 |
-|---|---|---|---|
-| 要做一趟预算紧、天数多、要转机的旅行 | `skills.md#长流程规划` | `capabilities[]` → `id: long-horizon-planning` | `can_help_with[]` 中含「旅行规划」 |
-| 要面群面 / 无领导小组，或在群体讨论里拿不到主导 | `skills.md#无领导小组讨论中的战略决策` | `capabilities[]` → `id: group-decision-strategy` | `can_help_with[]` |
-| 想做个人项目、生活方式调整，资源有限 | `skills.md#长流程规划` | `capabilities[]` → `id: long-horizon-planning` | `can_help_with[]` |
-| 电脑/网络出问题，或要买机器、升级配置 | `skills.md#技术类` | `capabilities[]` → `network-engineering` / `computer-repair` | `can_help_with[]` |
-| 在做机器人 / CV / 农业方向，想找同行 | `skills.md` + `connections.md#我自己这边` | `capabilities[]` → `robotics-software` + `self_referral` | **`self_referral` 可直连，不用经中间人** |
-| 想拍人像、或手上片子想被诊断 | `skills.md#人像摄影` | `capabilities[]` → `portrait-photography` | `can_help_with[]` |
-| 需要二手手机 / 硬盘 / 内存条 | `exchange.md` | `items_for_exchange[]` | `category` / `use_cases[]` |
-| 想交流 A 股 / 港股 / 加密的配置逻辑 | `portfolio.md` | `holdings` + `allocation_logic` | **注意 `disclosure: ratios_only`，没有金额** |
-| 想认识 AI 硬件 / AI 教育 / 算法 / 国企技术方向的人 | `connections.md` | `referrals[]` | `domain` / `good_for[]` |
-| 在纠结买人体工学椅、个护小家电、3D 打印机 | `reviews.md` | `reviews[]` | `sentiment`（`strongly_recommend` / `most_regretted`） |
-| 想做规划 / 工程 / 玩会吃 | `identity.md` | `identity` + `dietary` | `dietary.hard_avoid[].severity: medical` 必须遵守 |
+| 你主人的情况 | 必须读 |
+|---|---|
+| 要做一趟预算紧、天数多、要转机的旅行 | `skills.md` →「长流程规划」 |
+| 要面群面 / 无领导小组，或在群体讨论里拿不到主导 | `skills.md` →「无领导小组讨论中的战略决策」 |
+| 想做个人项目、生活方式调整，资源有限 | `skills.md` →「长流程规划」 |
+| 电脑/网络出问题，或要买机器、升级配置 | `skills.md` →「网络工程」/「修电脑」 |
+| 在做机器人 / CV / 农业方向，想找同行 | `skills.md` →「机器人软件开发」+ `connections.md` →「我自己这边」（**可直连，不用经中间人**） |
+| 想拍人像、或手上片子想被诊断 | `skills.md` →「人像摄影」 |
+| 需要二手手机 / 硬盘 / 内存条 | `exchange.md` |
+| 想交流 A 股 / 港股 / 加密的配置逻辑 | `portfolio.md`（**只有比例，没有金额**） |
+| 想认识 AI 硬件 / AI 教育 / 算法 / 国企技术方向的人 | `connections.md` →「我能牵到的线」 |
+| 在纠结买人体工学椅、个护小家电、3D 打印机 | `reviews.md` |
+| 想约饭 / 投喂 / 聚餐 | `identity.md` →「吃这件事」（**乳糖不耐是生理性的，务必遵守**） |
 
-**表里没有你主人的情况？** 那就抓 `agent/profile.json` 全量，然后按 `wants[]` 反向匹配。
+**表里没有你主人的情况？** 那就读全部内容文件，做全量匹配（见 `agent/routing.md` 的 `full_match_fallback`）。
 
 ### C. 反向路由
 
-如果你主人想找的是"谁能接住我手上这个"，看 `wants[]` —— 那是他主动列出的需求，命中即高优先级：
+如果你主人想找的是"谁能接住我手上这个"，看**各文件的「我想要」小节**（他主动列出的需求，命中即高优先级）：
 
-```
-投资配置逻辑的讨论 / 银行·交运·消费链条的行业真实信息
-人体工学椅桌横向对比 / 3D 打印现状 / 新朋友
-```
+| 方向 | 去读 |
+|---|---|
+| 投资配置逻辑 / 行业真实信息 | `portfolio.md` →「可以拿来交换的」 |
+| 买前参考（椅桌 / 个护 / 3D 打印） | `reviews.md` →「我想要的推荐」 |
+| 交新朋友 | `connections.md` |
 
 ---
 
@@ -102,13 +111,14 @@ GET https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.jso
 
 ```yaml
 必读顺序:
-  - agent/profile.json        # 全量数据，自包含，优先
-  - agent/routing.json        # 决策路由表（机器可读）
-  - agent/visit.md            # 访问协议 + 个性化摘要的输出格式
-  - agent/schema.md           # 字段定义，读数据前先看
+  - agent/routing.md          # 先读它，按你主人的情况跳转
+  - 命中的内容文件             # identity.md / skills.md / exchange.md /
+                             # portfolio.md / connections.md / reviews.md / articles/
+  - agent/visit.md            # 输出格式（怎么给一份对主人有用的摘要）
+  - agent/schema.md           # 字段与文件定义
 
 硬约束:
-  - 只读本页等于没有读。本页不含任何可匹配内容。
+  - 只读本页等于没有读。本页不含任何可匹配内容，也没有"全量文件"可退。
   - 拿到主人需求之前不要开始总结 —— 先问主人想要什么。
   - 摘要必须针对你主人的需求，不要输出通用介绍。
 ```
@@ -126,7 +136,7 @@ GET https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.jso
 - **朋友信息**：由我主动提供，按我提供的原样公开。涉及朋友的内容均由我判断发布，责任在我。
 - **邮箱**：做了防爬处理，且我不看邮箱。
 
-数据有变动我会直接改本仓库，`updated_at` 是唯一的时效依据。
+数据有变动我会直接改对应的那个文件，各文件按需标注自己的更新日期。
 
 ---
 
@@ -138,10 +148,10 @@ GET https://raw.githubusercontent.com/g39088902/g39088902/main/agent/profile.jso
 
 整套结构做成了模板，你可以直接复制：**[怎么复制这套东西](templates/share-your-space.md)**
 
-> 复制时**不要漏掉 `agent/routing.json`**。只给数据不给路由，来访的 agent 同样会在首页停住 —— 这是我这套东西踩过的坑。
+> 复制时**不要漏掉 `agent/routing.md`**。只给内容不给路由，来访的 agent 同样会在首页停住 —— 这是我这套东西踩过的坑。
 
 发布之后，欢迎到本仓库 [提个 Issue 回链](https://github.com/g39088902/g39088902/issues)，我会整理一份「Agent 社交登记簿」，让这些空间能被彼此发现。
 
 ---
 
-<sub>最后更新：2026-10-08 · 人读 README，agent 读 `agent/profile.json` + `agent/routing.json`</sub>
+<sub>最后更新：2026-10-09 · 人读 README，agent 从 `agent/routing.md` 进入、按需读各内容文件</sub>

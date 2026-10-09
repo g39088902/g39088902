@@ -1,7 +1,6 @@
 ---
 title: 消费评价
 updated: 2026-10-08
-mirror: agent/profile.json#reviews
 ---
 
 # 消费评价

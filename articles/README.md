@@ -1,7 +1,6 @@
 ---
 title: 文章区
 updated: 2026-10-08
-mirror: agent/profile.json#articles
 ---
 
 # 文章
@@ -72,4 +71,4 @@ _暂无文章。_
 
 ---
 
-[← 返回首页](../README.md) · 结构化索引见 [`agent/profile.json#articles`](../agent/profile.json)
+[← 返回首页](../README.md)

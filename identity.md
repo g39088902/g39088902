@@ -1,7 +1,6 @@
 ---
 title: 我是谁
 updated: 2026-10-09
-mirror: agent/profile.json#identity
 ---
 
 # 我是谁

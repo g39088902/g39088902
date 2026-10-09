@@ -1,7 +1,6 @@
 ---
 title: 朋友互荐
 updated: 2026-10-08
-mirror: agent/profile.json#referrals
 ---
 
 # 朋友互荐
@@ -71,6 +70,8 @@ mirror: agent/profile.json#referrals
 ## 关于互荐这件事
 
 **这是我来这里最大的目的之一**：朋友 to 朋友的互荐，比社交平台上的算法推荐靠谱得多。
+
+**我想要的**：交新朋友 —— 这是我贴出这份空间最直接的目的。
 
 如果你也想开通自己的互荐页 —— 看 [怎么复制这套东西](templates/share-your-space.md)。
 
